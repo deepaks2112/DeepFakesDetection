@@ -7,7 +7,7 @@ from facenet_pytorch.models.mtcnn import MTCNN
 from skimage.metrics._structural_similarity import structural_similarity
 from utils import centerCrop
 import pandas as pd
-
+from tqdm import tqdm
 
 
 
@@ -155,24 +155,29 @@ def extract_diff_masks(frames_df):
     fake_frames = './test_output/fake_frames/'
     diff_masks_dir = './test_output/diff_masks/'
     
-    for i in range(frames_df.shape[0]):
+    for i in tqdm(range(frames_df.shape[0])):
 
         if frames_df['Label'].values[i] == 1:
 
             real_frame = frames_df['Real Frame'].values[i]
             fake_frame = frames_df['Frame'].values[i]
 
-            frame1 = cv2.imread(real_frames + real_frame)
-            frame2 = cv2.imread(fake_frames + fake_frame)
+            
+            try:
+                frame1 = cv2.imread(real_frames + real_frame)
+                frame2 = cv2.imread(fake_frames + fake_frame)
 
 
-            d, mask = structural_similarity(frame1, frame2, multichannel = True, full = True)
-            mask = 1 - mask
-            mask = (mask * 255).astype(np.uint8)
-            mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
+                d, mask = structural_similarity(frame1, frame2, multichannel = True, full = True)
+                mask = 1 - mask
+                mask = (mask * 255).astype(np.uint8)
+                mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
 
-            mask_uid = fake_frame
-            cv2.imwrite(os.path.join(diff_masks_dir, fake_frame), mask)
+                mask_uid = fake_frame
+                cv2.imwrite(os.path.join(diff_masks_dir, fake_frame), mask)
+
+            except:
+                pass
 
 
 def extract_landmarks(frames_df):
@@ -186,11 +191,25 @@ def extract_landmarks(frames_df):
 
     ori_frames = []
 
-    for i in range(real_df.shape[0]):
+    for i in tqdm(range(real_df.shape[0])):
 
-        tmp = cv2.imread(real_path + real_df['Frame'].values[i])
-        bboxes, _, landmarks = detector.detect([tmp], landmarks=True)
-        np.save(landmark_path + real_df['Frame'].values[i], landmarks)
+        try:
+            tmp = cv2.imread(real_path + real_df['Frame'].values[i])
+            bboxes, _, landmarks = detector.detect([tmp], landmarks=True)
+            np.save(landmark_path + real_df['Frame'].values[i], landmarks)
+        except:
+            pass
+
+
+def generate_folds(frames_df, num_folds):
+
+    n = frames_df.shape[0]
+
+    folds = [i % num_folds for i in range(n)]
+    np.random.shuffle(folds)
+    
+    frames_df['Fold'] = folds
+    return frames_df
 
 '''class Preprocessor:
 
