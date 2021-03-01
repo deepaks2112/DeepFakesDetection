@@ -22,8 +22,8 @@ num_frames = args.frames
 num_folds = args.folds
 
 print(videos_path, metadata_path)
-print("Continue?")
-a=int(input())
+# print("Continue?")
+# a=int(input())
 
 out_dir = './test_output/'
 
