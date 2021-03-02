@@ -60,27 +60,31 @@ def extract_ori_crops_and_bboxes(vid_dir,out_dir,bbox_json,frames_df,num_frames=
 
     for idx, data in enumerate(zip(frame_idxs, bboxes, ori_frames)):
         f_id, bbox, frame = data
-        bbox = bbox[0]
+        
+        try:
+            bbox = bbox[0]
 
-        xmin, ymin, xmax, ymax = [int(b) for b in bbox]
-        w = xmax - xmin
-        h = ymax - ymin
-        p_h = h // 3
-        p_w = w // 3
+            xmin, ymin, xmax, ymax = [int(b) for b in bbox]
+            w = xmax - xmin
+            h = ymax - ymin
+            p_h = h // 3
+            p_w = w // 3
 
-        H, W = frame.shape[:2]
+            H, W = frame.shape[:2]
 
-        crop = frame[
-               max(ymin - p_h, 0):min(ymax + p_h, H),
-               max(xmin - p_w, 0):min(xmax + p_w, W),
-               ]
+            crop = frame[
+                   max(ymin - p_h, 0):min(ymax + p_h, H),
+                   max(xmin - p_w, 0):min(xmax + p_w, W),
+                   ]
 
-        crop_uid = vid_name + "_" + str(f_id) + ".png"
-        cv2.imwrite(os.path.join(out_dir,crop_uid), crop)
-        frames_df = frames_df.append({'Label': 0, 'Frame': crop_uid, 'Real Frame': crop_uid}, ignore_index=True)
+            crop_uid = vid_name + "_" + str(f_id) + ".png"
+            cv2.imwrite(os.path.join(out_dir,crop_uid), crop)
+            frames_df = frames_df.append({'Label': 0, 'Frame': crop_uid, 'Real Frame': crop_uid}, ignore_index=True)
 
-        # lmark_t = [[i[0],i[1]] for i in lmark[0]]
-        landmarks_json[crop_uid] = [int(b) for b in bbox]
+            # lmark_t = [[i[0],i[1]] for i in lmark[0]]
+            landmarks_json[crop_uid] = [int(b) for b in bbox]
+        except:
+            pass
     # print(json.dumps(landmarks_json))
     with open(os.path.join('.',bbox_json),'w') as fout:
         json.dump(landmarks_json, fout)
