@@ -94,61 +94,64 @@ def extract_ori_crops_and_bboxes(vid_dir,out_dir,bbox_json,frames_df,num_frames=
 
 def extract_fake_crops(vid_dir, out_dir, bbox_json, frames_df, num_frames = 32):
 
-    with open(bbox_json,'r') as f:
-        bbox_json_file = json.load(f)
+    try:
+        with open(bbox_json,'r') as f:
+            bbox_json_file = json.load(f)
 
-    vid_name = os.path.split(vid_dir)[-1].split('.')[0]
-    capture = cv2.VideoCapture(vid_dir)
-    frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
+        vid_name = os.path.split(vid_dir)[-1].split('.')[0]
+        capture = cv2.VideoCapture(vid_dir)
+        frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    if frame_count <= 0:
-        return frames_df
+        if frame_count <= 0:
+            return frames_df
 
-    frame_idxs = np.linspace(0, frame_count - 1, num_frames, endpoint=True, dtype=np.int)
+        frame_idxs = np.linspace(0, frame_count - 1, num_frames, endpoint=True, dtype=np.int)
 
-    fake_frames = []
-    idxs_read = 0
+        fake_frames = []
+        idxs_read = 0
 
-    for frame_idx in range(frame_idxs[0], frame_idxs[-1] + 1):
+        for frame_idx in range(frame_idxs[0], frame_idxs[-1] + 1):
 
-        ret = capture.grab()
-        if not ret:
-            break
-
-        if frame_idx == frame_idxs[idxs_read]:
-            ret, frame = capture.retrieve()
-            if not ret or frame is None:
+            ret = capture.grab()
+            if not ret:
                 break
 
-            fake_frames.append(frame)
-            idxs_read += 1
+            if frame_idx == frame_idxs[idxs_read]:
+                ret, frame = capture.retrieve()
+                if not ret or frame is None:
+                    break
 
-    ori_vid_name = os.path.split(bbox_json)[-1].split('.')[0]
-    
-    for frame_idx, frame in zip(frame_idxs, fake_frames):
+                fake_frames.append(frame)
+                idxs_read += 1
+
+        ori_vid_name = os.path.split(bbox_json)[-1].split('.')[0]
         
-        key = ori_vid_name + "_" + str(frame_idx) + ".png"
-        bbox = bbox_json_file.get(key,[])
+        for frame_idx, frame in zip(frame_idxs, fake_frames):
+            
+            key = ori_vid_name + "_" + str(frame_idx) + ".png"
+            bbox = bbox_json_file.get(key,[])
 
-        if bbox==[]:
-            continue
+            if bbox==[]:
+                continue
 
-        xmin, ymin, xmax, ymax = [int(b) for b in bbox]
-        w = xmax - xmin
-        h = ymax - ymin
-        p_h = h // 3
-        p_w = w // 3
+            xmin, ymin, xmax, ymax = [int(b) for b in bbox]
+            w = xmax - xmin
+            h = ymax - ymin
+            p_h = h // 3
+            p_w = w // 3
 
-        H, W = frame.shape[:2]
+            H, W = frame.shape[:2]
 
-        crop = frame[
-               max(ymin - p_h, 0):min(ymax + p_h, H),
-               max(xmin - p_w, 0):min(xmax + p_w, W),
-               ]
+            crop = frame[
+                   max(ymin - p_h, 0):min(ymax + p_h, H),
+                   max(xmin - p_w, 0):min(xmax + p_w, W),
+                   ]
 
-        crop_uid = vid_name + "_" + str(frame_idx) + ".png"
-        cv2.imwrite(os.path.join(out_dir,crop_uid), crop)
-        frames_df = frames_df.append({'Label': 1, 'Frame': crop_uid, 'Real Frame': ori_vid_name + "_" + str(frame_idx) + ".png"}, ignore_index=True)
+            crop_uid = vid_name + "_" + str(frame_idx) + ".png"
+            cv2.imwrite(os.path.join(out_dir,crop_uid), crop)
+            frames_df = frames_df.append({'Label': 1, 'Frame': crop_uid, 'Real Frame': ori_vid_name + "_" + str(frame_idx) + ".png"}, ignore_index=True)
+    except:
+        pass
     # frames_df.to_csv('./test_output/frames_df.csv',index=False)
 
     return frames_df
