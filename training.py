@@ -57,7 +57,10 @@ class ClassifierDataset(Dataset):
 				if self.mode == "train":
 					label = np.clip(label, self.label_smoothing, 1-self.label_smoothing)
 
-				img_path = os.path.join(self.data_root,self.crops_dir, frame)
+				if label > 0.5:
+					img_path = os.path.join(self.data_root, 'fake_frames', frame)
+				else:
+					img_path = os.path.join(self.data_root, 'real_frames', frame)
 				image = cv2.imread(img_path, cv2.IMREAD_COLOR)
 				image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 				mask = np.zeros(image.shape[:2], dtype=np.uint8)
@@ -118,7 +121,7 @@ class ClassifierDataset(Dataset):
 				image = img_to_tensor(image, self.normalize)
 
 				return {"image": image, 
-					"labels": np.array((label,)), 
+					"labels": np.array([label]), 
 					"img_name": frame,
 					"valid": valid_label,
 					"rotations": rotation}
