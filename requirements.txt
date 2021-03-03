@@ -1,3 +1,4 @@
 typing
 facenet_pytorch
 opencv-python
+albumentations
