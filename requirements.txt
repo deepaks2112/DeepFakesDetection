@@ -1,4 +1,4 @@
 typing
 facenet_pytorch
 opencv-python
-albumentations
+albumentations==0.5.0
