@@ -80,7 +80,7 @@ class ClassifierDataset(Dataset):
 					# print(landmark_path, os.path.exists(landmark_path))
 					# return (None,None)
 					if os.path.exists(landmark_path) and random.random() < 0.7:
-						landmarks = np.load(landmark_path, )
+						landmarks = np.load(landmark_path, allow_pickle = True)
 						image = remove_landmark(image, landmarks[0][0])
 					elif random.random() < 0.2:
 						image = blackout_convex_hull(image)
