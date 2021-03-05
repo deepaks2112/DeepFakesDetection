@@ -90,7 +90,7 @@ class ClassifierDataset(Dataset):
 						masks = prepare_bit_masks((binary_mask * 1).astype(np.uint8))
 						tries = 6
 						current_try = 1
-						print("here")
+						# print("here")
 						while current_try < tries:
 							bitmap_msk = random.choice(masks)
 							if label < 0.5 or np.count_nonzero(mask * bitmap_msk) > 20:
