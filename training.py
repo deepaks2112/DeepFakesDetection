@@ -42,6 +42,7 @@ class ClassifierDataset(Dataset):
 		self.normalize = normalize
 		self.transforms = transforms
 		self.df = pd.read_csv(os.path.join(self.data_root,self.folds_csv))
+		self.df = self.df.sample(frac=1).reset_index(drop=True)
 		self.oversample_real = oversample_real
 		self.reduce_val = reduce_val
 		self.data = self.df.values
