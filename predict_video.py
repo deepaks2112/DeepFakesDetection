@@ -4,7 +4,7 @@ import os
 import torch
 from albumentations.pytorch.functional import img_to_tensor
 
-def predict_video(model, video_dir, n_frames=32):
+def predict_video(model, vid_dir, n_frames=32):
 	vid_name = os.path.split(vid_dir)[-1].split('.')[0]
 	capture = cv2.VideoCapture(vid_dir)
 	frame_count = int(capture.get(cv2.CAP_PROP_FRAME_COUNT))
