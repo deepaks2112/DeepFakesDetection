@@ -21,7 +21,7 @@ def read_frames_df():
     return frames_df
 
 
-def extract_ori_crops_and_bboxes(vid_dir,out_dir,bbox_json,frames_df,num_frames=32):
+def extract_ori_crops_and_bboxes(vid_dir,out_dir,bbox_json,frames_df,num_frames=32, detector=MTCNN()):
     
     vid_name = os.path.split(vid_dir)[-1].split('.')[0]
     capture = cv2.VideoCapture(vid_dir)
@@ -51,7 +51,7 @@ def extract_ori_crops_and_bboxes(vid_dir,out_dir,bbox_json,frames_df,num_frames=
 
     # Finding face bounding boxes
 
-    detector = MTCNN()
+    # detector = MTCNN()
     bboxes, *_ = detector.detect(ori_frames, landmarks=False)
 
     # Extracting crops
