@@ -3,6 +3,7 @@ import cv2
 import os
 import torch
 from albumentations.pytorch.functional import img_to_tensor
+from facenet_pytorch.models.mtcnn import MTCNN
 
 def predict_video(model, vid_dir, num_frames=32):
 	vid_name = os.path.split(vid_dir)[-1].split('.')[0]
