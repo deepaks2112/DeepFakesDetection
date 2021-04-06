@@ -253,8 +253,7 @@ def get_convex_hull_outline(img, thickness=60):
         mask2=thick_outline_polygon(mask, Y, X, 60)
 
         img2=(img*mask2)
+        return img2
 
     except:
-        img2=img
-        pass
-    return img2
+        return img
