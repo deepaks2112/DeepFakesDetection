@@ -125,7 +125,7 @@ class ClassifierDataset(Dataset):
 					image = rot90(image, rotation)
 
 				image = img_to_tensor(image, self.normalize)
-				outline = img_to_tensor(outline, self.normalize)
+				outline_img = img_to_tensor(outline_img, self.normalize)
 
 				return {"image": image, 
 					"labels": np.array([label]), 
