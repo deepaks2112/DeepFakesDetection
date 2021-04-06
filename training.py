@@ -5,7 +5,7 @@ import pandas as pd
 import os
 import random
 from augmentations import remove_landmark, blackout_convex_hull
-from augmentations import prepare_bit_masks
+from augmentations import prepare_bit_masks, get_convex_hull_outline
 from albumentations.augmentations.functional import rot90
 from albumentations.pytorch.functional import img_to_tensor
 
@@ -67,6 +67,8 @@ class ClassifierDataset(Dataset):
 				mask = np.zeros(image.shape[:2], dtype=np.uint8)
 				diff_path = os.path.join(self.data_root, "diff_masks", frame)
 
+				outline_img = get_convex_hull_outline(image, 65)
+				
 				try:
 					msk = cv2.imread(diff_path, cv2.IMREAD_GRAYSCALE)
 					if msk is not None:
@@ -104,6 +106,8 @@ class ClassifierDataset(Dataset):
 				valid_label = 1 if valid_label else 0
 				rotation = 0
 
+				
+
 				if self.transforms:
 					data = self.transforms(image=image, mask=mask)
 					image = data["image"]
@@ -126,7 +130,8 @@ class ClassifierDataset(Dataset):
 					"labels": np.array([label]), 
 					"img_name": frame,
 					"valid": valid_label,
-					"rotations": rotation}
+					"rotations": rotation,
+					"outline": outline_img}
 
 				
 

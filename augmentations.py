@@ -92,6 +92,8 @@ def blackout_convex_hull(img):
         sp = predictor(img, rect)
         landmarks = np.array([[p.x, p.y] for p in sp.parts()])
         outline=landmarks[[*range(17), *range(26, 16, -1)]]
+
+        # if random.random >= 0.5:
         Y, X = skimage.draw.polygon(outline[:,1], outline[:,0])
         cropped_img = np.zeros(img.shape[:2], dtype=np.uint8)
         cropped_img[Y, X] = 1
@@ -214,3 +216,45 @@ def blend_original(img):
 # def blackout_random(img, mask, label):
 
 
+
+def thick_outline_polygon(mask, Y, X, thickness):
+  mask=mask.copy()
+  for y,x in zip(Y,X):
+    mask[y][x]=np.ones(3)
+    for i in range(max(0,y-thickness//2),y):
+      mask[i][x]=np.ones(3)
+    for i in range(y,min(mask.shape[0],y+thickness//2)):
+      mask[i][x]=np.ones(3)
+    for i in range(max(0,x-thickness//2),x):
+      mask[y][i]=np.ones(3)
+    for i in range(x,min(mask.shape[1],x+thickness//2)):
+      mask[y][i]=np.ones(3)
+  
+  # for i in range(mask.shape[0]):
+  #   for j in range(mask.shape[1]):
+  #     if mask[i][j]>0:
+  #       mask[i][j]=1
+  
+  return mask
+
+
+def get_convex_hull_outline(img, thickness=60):
+    img=img.copy()
+    try:
+        rect = detector(img)[0]
+        sp = predictor(img, rect)
+        landmarks = np.array([[p.x, p.y] for p in sp.parts()])
+        outline=landmarks[[*range(17), *range(26, 16, -1)]]
+
+        # if random.random >= 0.5:
+        Y, X = skimage.draw.polygon_perimeter(outline[:,1], outline[:,0])
+        mask=np.zeros(img.shape, dtype=np.float32)
+    # print(mask.shape)
+        mask2=thick_outline_polygon(mask, Y, X, 60)
+
+        img2=(img*mask2)
+
+    except:
+        img2=img
+        pass
+    return img2
