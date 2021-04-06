@@ -68,6 +68,7 @@ class ClassifierDataset(Dataset):
 				diff_path = os.path.join(self.data_root, "diff_masks", frame)
 
 				outline_img = get_convex_hull_outline(image, 65)
+				outline_img = cv2.resize(outline_img, (300,300))
 
 				try:
 					msk = cv2.imread(diff_path, cv2.IMREAD_GRAYSCALE)
