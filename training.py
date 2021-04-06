@@ -68,7 +68,7 @@ class ClassifierDataset(Dataset):
 				diff_path = os.path.join(self.data_root, "diff_masks", frame)
 
 				outline_img = get_convex_hull_outline(image, 65)
-				
+
 				try:
 					msk = cv2.imread(diff_path, cv2.IMREAD_GRAYSCALE)
 					if msk is not None:
@@ -125,6 +125,7 @@ class ClassifierDataset(Dataset):
 					image = rot90(image, rotation)
 
 				image = img_to_tensor(image, self.normalize)
+				outline = img_to_tensor(outline, self.normalize)
 
 				return {"image": image, 
 					"labels": np.array([label]), 
