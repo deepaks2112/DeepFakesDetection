@@ -252,6 +252,9 @@ def get_convex_hull_outline(img, thickness=60):
     # print(mask.shape)
         mask2=thick_outline_polygon(mask, Y, X, 60)
 
+        img=np.array(img, dtype=np.float32)
+        img/=255
+
         img2=(img*mask2)
         return img2
 
